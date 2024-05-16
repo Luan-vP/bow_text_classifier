@@ -45,3 +45,14 @@ def get_dataset_filepath(dataset_name: str) -> Path:
 
 for dataset_name, url in DATASETS.items():
     download_dataset(url, get_dataset_filepath(dataset_name))
+
+
+def _parse_data(input: str) -> list[tuple[str, str]]:
+
+    output = []
+
+    for line in input.lower().strip().split("\n"):
+        label, text = line.split(" ||| ")
+        output.append((label, text))
+
+    return output

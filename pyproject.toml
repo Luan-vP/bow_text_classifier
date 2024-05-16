@@ -12,6 +12,7 @@ torch = "2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
+pytest = "^8.2.0"
 
 [build-system]
 requires = ["poetry-core"]
