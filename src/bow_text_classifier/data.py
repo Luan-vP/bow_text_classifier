@@ -74,6 +74,7 @@ def _create_dict(
         tag_to_index (dict[str, int], optional): Dictionary mapping tags to indices. Defaults to {}.
         check_unk (bool, optional): Whether to check for unknown words. Defaults to False.
     """
+    # TODO - Consider decoupling the input dictionary with deepcopy()
 
     if not word_to_index:
         word_to_index["<unk>"] = 0
