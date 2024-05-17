@@ -1,9 +1,12 @@
 import random
+from pathlib import Path
 
 import torch
 import torch.nn as nn
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+model_dir = Path(__file__).parent.parent.parent / "models"
 
 
 # create a simple neural network with embedding layer, bias, and xavier initialization
@@ -120,3 +123,26 @@ def perform_inference(model, sentence, word_to_index, tag_to_index, device):
 
     # Return an error message if the tag is not found
     return "Tag not found"
+
+
+def save_model(model, path):
+    """
+    Save the trained BoW model to a file.
+
+    Args:
+        model (torch.nn.Module): The trained BoW model.
+        path (str): The file path to save the model to.
+    """
+    torch.save(model.state_dict(), path)
+
+
+# TODO Integrate architecture params
+def load_model(model, path):
+    """
+    Load a trained BoW model from a file.
+
+    Args:
+        model (torch.nn.Module): The BoW model architecture.
+        path (str): The file path to load the model from.
+    """
+    model.load_state_dict(torch.load(path))
