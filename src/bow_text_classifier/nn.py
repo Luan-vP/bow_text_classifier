@@ -27,7 +27,12 @@ class BoW(torch.nn.Module):
 
 # function to convert sentence into tensor using word_to_index dictionary
 def sentence_to_tensor(sentence, word_to_index):
-    return torch.LongTensor([word_to_index[_word] for _word in sentence.split(" ")])
+    return torch.LongTensor(
+        [
+            word_to_index[_word] if _word in word_to_index else word_to_index["<unk>"]
+            for _word in sentence.split(" ")
+        ]
+    )
 
 
 # perform training of the Bow model
