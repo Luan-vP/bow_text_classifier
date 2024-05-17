@@ -43,6 +43,7 @@ def get_dataset_filepath(dataset_name: str) -> Path:
     return data_dir / "classes" / (dataset_name + ".txt")
 
 
+# N.B. This is a side-effect that downloads the dataset files to the data directory
 for dataset_name, url in DATASETS.items():
     download_dataset(url, get_dataset_filepath(dataset_name))
 

@@ -21,3 +21,8 @@ class BoW(torch.nn.Module):
         out = torch.sum(emb, dim=0) + self.bias
         out = out.view(1, -1)
         return out
+
+
+# function to convert sentence into tensor using word_to_index dictionary
+def sentence_to_tensor(sentence, word_to_index):
+    return torch.LongTensor([word_to_index[_word] for _word in sentence.split(" ")])
