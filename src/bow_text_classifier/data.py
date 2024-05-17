@@ -91,3 +91,12 @@ def _create_dict(
             tag_to_index[tag] = len(tag_to_index)
 
     return word_to_index, tag_to_index
+
+
+def _create_tensors(data, word_to_index, tag_to_index):
+    for tag, sentence in data:
+        # N.B. The order changes here to ([sentence], tag)
+        yield (
+            [word_to_index[word] for word in sentence.split(" ")],
+            tag_to_index[tag],
+        )
