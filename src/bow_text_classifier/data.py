@@ -56,3 +56,38 @@ def _parse_data(input: str) -> list[tuple[str, str]]:
         output.append((label, text))
 
     return output
+
+
+# create word to index dictionary and tag to index dictionary from data
+def _create_dict(
+    data: list[tuple[str, str]],
+    word_to_index: dict[str, int] = {},
+    tag_to_index: dict[str, int] = {},
+    check_unk=False,
+):
+    """
+    Create word_to_index dictionary and tag_to_index dictionary from data.
+
+    Args:
+        data (list[tuple[str, str]]): List of tuples containing tag and sentences.
+        word_to_index (dict[str, int], optional): Dictionary mapping words to indices. Defaults to {}.
+        tag_to_index (dict[str, int], optional): Dictionary mapping tags to indices. Defaults to {}.
+        check_unk (bool, optional): Whether to check for unknown words. Defaults to False.
+    """
+
+    if not word_to_index:
+        word_to_index["<unk>"] = 0
+
+    for tag, sentence in data:
+        for word in sentence.split(" "):
+            if check_unk:
+                if word not in word_to_index:
+                    word_to_index[word] = word_to_index["<unk>"]
+            else:
+                if word not in word_to_index:
+                    word_to_index[word] = len(word_to_index)
+
+        if tag not in tag_to_index:
+            tag_to_index[tag] = len(tag_to_index)
+
+    return word_to_index, tag_to_index
