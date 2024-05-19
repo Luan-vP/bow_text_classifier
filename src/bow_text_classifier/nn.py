@@ -1,18 +1,51 @@
+import json
 import random
+from logging import Logger
 from pathlib import Path
 
 import torch
 import torch.nn as nn
+
+logger = Logger(__name__)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 model_dir = Path(__file__).parent.parent.parent / "models"
 
 
+class BoW_Classifier:
+    def __init__(self):
+        self._model = None
+        self.word_to_index = None
+        self.tag_to_index = None
+
+    def __call__(self, input):
+        return self.predict(input)
+
+    def load_model(self, model_package_dir):
+        if self._model is None:
+            with open(model_package_dir / "word_to_index.json", "r") as f:
+                self.word_to_index = json.load(f)
+            with open(model_package_dir / "tag_to_index.json", "r") as f:
+                self.tag_to_index = json.load(f)
+
+            self._model = _BoW(len(self.word_to_index), len(self.tag_to_index))
+            self._model.load_state_dict(torch.load(model_package_dir / "model.pth"))
+            self._model.eval()
+
+    def predict(self, input):
+        if self._model is None:
+            raise RuntimeError("You must load the model before making a prediction")
+        output = perform_inference(
+            self._model, input, self.word_to_index, self.tag_to_index, device
+        )
+        return output
+
+
 # create a simple neural network with embedding layer, bias, and xavier initialization
-class BoW(torch.nn.Module):
+class _BoW(torch.nn.Module):
     def __init__(self, nwords, ntags):
-        super(BoW, self).__init__()
+        super(_BoW, self).__init__()
         self.Embedding = nn.Embedding(nwords, ntags)
         nn.init.xavier_uniform_(self.Embedding.weight)
 
@@ -125,7 +158,7 @@ def perform_inference(model, sentence, word_to_index, tag_to_index, device):
     return "Tag not found"
 
 
-def save_model(model, path):
+def save_model(model, word_to_index, tag_to_index, model_package_path: Path):
     """
     Save the trained BoW model to a file.
 
@@ -133,11 +166,19 @@ def save_model(model, path):
         model (torch.nn.Module): The trained BoW model.
         path (str): The file path to save the model to.
     """
-    torch.save(model.state_dict(), path)
+    model_package_path.mkdir(parents=True, exist_ok=True)
+
+    torch.save(model.state_dict(), model_package_path / "model.pth")
+
+    with open(model_package_path / "word_to_index.json", "w") as f:
+        json.dump(word_to_index, f)
+    with open(model_package_path / "tag_to_index.json", "w") as f:
+        json.dump(tag_to_index, f)
+
+    logger.info(f"Model saved to {model_package_path}")
 
 
-# TODO Integrate architecture params
-def load_model(model, path):
+def load_model(model, model_package_dir):
     """
     Load a trained BoW model from a file.
 
@@ -145,4 +186,5 @@ def load_model(model, path):
         model (torch.nn.Module): The BoW model architecture.
         path (str): The file path to load the model from.
     """
-    model.load_state_dict(torch.load(path))
+
+    model.load_state_dict(torch.load(model_package_dir / "model.pth"))
