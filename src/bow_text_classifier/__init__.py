@@ -17,4 +17,4 @@ if MODEL_PACKAGE_DIR is not None:
     else:
         raise FileNotFoundError(f"Model file not found: {MODEL_PACKAGE_DIR}")
 
-__all__ = ["model"]
+__all__ = ["model", BoW_Classifier]
