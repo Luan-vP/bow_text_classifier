@@ -18,7 +18,12 @@ DATASETS = {
 }
 
 
-def create_training_datasets():
+def create_training_datasets() -> tuple[
+    list[tuple[list[int], int]],
+    list[tuple[list[int], int]],
+    dict[str, int],
+    dict[str, int],
+]:
     for dataset_name, url in DATASETS.items():
         download_dataset(url, get_dataset_filepath(dataset_name))
 

@@ -19,6 +19,8 @@ if MODEL_PACKAGE_DIR is not None:
         model.load_model(MODEL_PACKAGE_DIR)
     else:
         raise FileNotFoundError(f"Model file not found: {MODEL_PACKAGE_DIR}")
+else:
+    raise FileNotFoundError("MODEL_PACKAGE_DIR environment variable not set")
 
 
 app = FastAPI()
