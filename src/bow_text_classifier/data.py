@@ -1,8 +1,5 @@
 """
 This module contains functions for downloading and parsing datasets.
-
-N.B. It contains a side-effect that downloads the dataset files to the data
-directory on import to ensure its availability.
 """
 
 from logging import Logger
@@ -19,6 +16,28 @@ DATASETS = {
     "train": "https://raw.githubusercontent.com/neubig/nn4nlp-code/master/data/classes/train.txt",
     "test": "https://raw.githubusercontent.com/neubig/nn4nlp-code/master/data/classes/test.txt",
 }
+
+
+def create_training_datasets():
+    for dataset_name, url in DATASETS.items():
+        download_dataset(url, get_dataset_filepath(dataset_name))
+
+    with open(get_dataset_filepath("train"), "r") as f:
+        train_data = _parse_data(f.read())
+
+    with open(get_dataset_filepath("test"), "r") as f:
+        test_data = _parse_data(f.read())
+
+    word_to_index, tag_to_index = _create_dict(train_data)
+
+    word_to_index, tag_to_index = _create_dict(
+        test_data, word_to_index, tag_to_index, check_unk=True
+    )
+
+    train_data = list(_create_tensors(train_data, word_to_index, tag_to_index))
+    test_data = list(_create_tensors(test_data, word_to_index, tag_to_index))
+
+    return train_data, test_data, word_to_index, tag_to_index
 
 
 def download_dataset(url: str, output_file: Path | str):
@@ -41,11 +60,6 @@ def download_dataset(url: str, output_file: Path | str):
 
 def get_dataset_filepath(dataset_name: str) -> Path:
     return data_dir / "classes" / (dataset_name + ".txt")
-
-
-# N.B. This is a side-effect that downloads the dataset files to the data directory
-for dataset_name, url in DATASETS.items():
-    download_dataset(url, get_dataset_filepath(dataset_name))
 
 
 def _parse_data(input: str) -> list[tuple[str, str]]:
