@@ -72,7 +72,14 @@ def sentence_to_tensor(sentence, word_to_index):
 
 
 # perform training of the Bow model
-def train_bow(model, optimizer, criterion, train_data, test_data, type):
+def train_bow(
+    model: _BoW,
+    optimizer,
+    criterion,
+    train_data: list[tuple[str, str]],
+    test_data: list[tuple[str, str]],
+    type: torch.cuda.LongTensor | torch.LongTensor,
+):
     for ITER in range(10):
         # perform training
         model.train()
